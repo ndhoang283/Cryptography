@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Semester_4\\Cryptography\\Microservice\\Play.Catalog\\src\\Play.Catalog.Service\\Play.Catalog.Service.csproj": {}
+    "D:\\Semester_4\\Cryptography\\Do An\\Cryptography\\Microservice\\Play.Catalog\\src\\Play.Catalog.Service\\Play.Catalog.Service.csproj": {}
   },
   "projects": {
-    "D:\\Semester_4\\Cryptography\\Microservice\\Play.Catalog\\src\\Play.Catalog.Service\\Play.Catalog.Service.csproj": {
+    "D:\\Semester_4\\Cryptography\\Do An\\Cryptography\\Microservice\\Play.Catalog\\src\\Play.Catalog.Service\\Play.Catalog.Service.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Semester_4\\Cryptography\\Microservice\\Play.Catalog\\src\\Play.Catalog.Service\\Play.Catalog.Service.csproj",
+        "projectUniqueName": "D:\\Semester_4\\Cryptography\\Do An\\Cryptography\\Microservice\\Play.Catalog\\src\\Play.Catalog.Service\\Play.Catalog.Service.csproj",
         "projectName": "Play.Catalog.Service",
-        "projectPath": "D:\\Semester_4\\Cryptography\\Microservice\\Play.Catalog\\src\\Play.Catalog.Service\\Play.Catalog.Service.csproj",
+        "projectPath": "D:\\Semester_4\\Cryptography\\Do An\\Cryptography\\Microservice\\Play.Catalog\\src\\Play.Catalog.Service\\Play.Catalog.Service.csproj",
         "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "D:\\Semester_4\\Cryptography\\Microservice\\Play.Catalog\\src\\Play.Catalog.Service\\obj\\",
+        "outputPath": "D:\\Semester_4\\Cryptography\\Do An\\Cryptography\\Microservice\\Play.Catalog\\src\\Play.Catalog.Service\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
