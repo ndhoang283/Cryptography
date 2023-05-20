@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using OurProject.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +30,12 @@ namespace OurProject
         {
 
             services.AddControllers();
+
+            services.AddDbContext<MyDbContext>(option =>
+            {
+                option.UseSqlServer(Configuration.GetConnectionString("MyDB"));
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OurProject", Version = "v1" });
