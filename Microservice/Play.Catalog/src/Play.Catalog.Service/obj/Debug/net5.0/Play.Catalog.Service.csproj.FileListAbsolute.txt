@@ -77,3 +77,11 @@ D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play
 D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\obj\Debug\net5.0\Play.Catalog.Service.pdb
 D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\obj\Debug\net5.0\Play.Catalog.Service.genruntimeconfig.cache
 D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\obj\Debug\net5.0\ref\Play.Catalog.Service.dll
+D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\bin\Debug\net5.0\Microsoft.Extensions.Configuration.dll
+D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\bin\Debug\net5.0\Microsoft.Extensions.Configuration.Abstractions.dll
+D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\bin\Debug\net5.0\Microsoft.Extensions.Configuration.Binder.dll
+D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\bin\Debug\net5.0\Microsoft.Extensions.DependencyInjection.dll
+D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\bin\Debug\net5.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\bin\Debug\net5.0\Microsoft.Extensions.Primitives.dll
+D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\bin\Debug\net5.0\Play.Common.dll
+D:\Semester_4\Cryptography\Do An\Cryptography\Microservice\Play.Catalog\src\Play.Catalog.Service\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
