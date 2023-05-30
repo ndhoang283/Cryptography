@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OurProject.Data;
@@ -23,8 +24,15 @@ namespace OurProject.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var dsLoai = _context.Loais.ToList();
-            return Ok(dsLoai);
+            try
+            {
+                var dsLoai = _context.Loais.ToList();
+                return Ok(dsLoai);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet("{id}")]
@@ -43,6 +51,7 @@ namespace OurProject.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult CreateNew(LoaiModel model)
         {
             try
@@ -53,7 +62,7 @@ namespace OurProject.Controllers
                 };
                 _context.Add(loai);
                 _context.SaveChanges();
-                return Ok(loai);
+                return StatusCode(StatusCodes.Status201Created, loai);
             }
             catch
             {
@@ -71,6 +80,23 @@ namespace OurProject.Controllers
                 loai.TenLoai = model.TenLoai;
                 _context.SaveChanges();
                 return NoContent();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteLoaiById(int id)
+        {
+            var loai = _context.Loais.SingleOrDefault(lo =>
+            lo.MaLoai == id);
+            if (loai != null)
+            {
+                _context.Remove(loai);
+                _context.SaveChanges();
+                return StatusCode(StatusCodes.Status200OK);
             }
             else
             {

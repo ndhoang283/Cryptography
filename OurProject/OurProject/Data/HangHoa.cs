@@ -15,7 +15,7 @@ namespace OurProject.Data
 
         [Required]
         [MaxLength(100)]
-        public string TeHh { get; set; }
+        public string TenHh { get; set; }
 
         public string MoTa { get; set; }
 
@@ -27,5 +27,11 @@ namespace OurProject.Data
         public int? MaLoai { get; set; }
         [ForeignKey("MaLoai")]
         public Loai Loai { get; set; }
+
+        public ICollection<DonHangChiTiet> DonHangChiTiets { get; set; }
+        public HangHoa()
+        {
+            DonHangChiTiets = new HashSet<DonHangChiTiet>();
+        }
     }
 }
