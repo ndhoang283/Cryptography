@@ -33,7 +33,7 @@ namespace OurProject.Controllers
         public async Task<IActionResult> Validate(LoginModel model)
         {
             var user = _context.NguoiDungs.SingleOrDefault(p => p.UserName ==
-                model.UserName && model.Password == p.Password);
+                model.UserName && HashPassword(model.Password, _appSettings.SecretKey) == p.Password);
             if (user == null) // Khong dung
             {
                 return Ok(new ApiResponse
@@ -248,6 +248,64 @@ namespace OurProject.Controllers
             dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
 
             return dateTimeInterval;
+        }
+
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register(RegisterModel model)
+        {
+            try
+            {
+                if (model.Password != model.ConfirmPassword)
+                {
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Password and Confirm Password not match."
+                    });
+                }
+
+                var user = _context.NguoiDungs.SingleOrDefault(p => p.UserName == model.UserName);
+
+                if (user != null || model.Password != model.ConfirmPassword)
+                {
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "This username already exists."
+                    });
+                }
+
+                var newUser = new NguoiDung
+                {
+                    UserName = model.UserName,
+                    Password = HashPassword(model.Password, _appSettings.SecretKey),
+                    HoTen = model.HoTen,
+                    Email = model.Email
+                };
+
+                _context.NguoiDungs.Add(newUser);
+                _context.SaveChanges();
+
+                return StatusCode(StatusCodes.Status201Created, user);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        static string HashPassword(string password, string secretKey)
+        {
+            byte[] keyBytes = Encoding.UTF8.GetBytes(secretKey);
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+            using (HMACSHA256 hmac = new HMACSHA256(keyBytes))
+            {
+                byte[] hashedBytes = hmac.ComputeHash(passwordBytes);
+                string hashedPassword = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+
+                return hashedPassword;
+            }
         }
     }
 }
