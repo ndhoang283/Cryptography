@@ -1,16 +1,35 @@
 const express = require('express');
 var router = express.Router();
 const AccountModel = require('../models/account');
+const { json } = require('body-parser');
+const PAGE_SIZE = 5
 
 // lay du lieu tu db
 router.get('/', (req, res, next)=>{
-    AccountModel.find({})
-    .then(data=>{
-        res.json(data)
-    })
-    .catch(err=>{
-        res.status(500).json('Loi server')
-    })
+    var page = req.query.page;
+    if(page) {
+        page = parseInt(page)
+        var skip = (page - 1) * PAGE_SIZE
+
+        AccountModel.find({})
+        .skip(skip)
+        .limit(PAGE_SIZE)
+        .then(data=>{
+            res.json(data)
+        })
+        .catch(err=>{
+            res.status(500).json
+        })
+    }
+    else {
+        AccountModel.find({})
+        .then(data=>{
+            res.json(data)
+        })
+        .catch(err=>{
+            res.status(500).json('Loi server')
+        })
+    }   
 })
 
 router.get('/:id', (req, res, next)=>{

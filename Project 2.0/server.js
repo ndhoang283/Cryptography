@@ -6,7 +6,7 @@ const path = require('path')
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use('/public', express.static(path.join(__dirname, './public')))
+app.use('/public', express.static(path.join(__dirname, 'public')))
 
 app.post('/register', async (req, res) => {
     try {
@@ -52,8 +52,8 @@ var accountRouter = require('./routers/account')
 
 app.use('/api/account/', accountRouter)
 
-app.get('/', (req, res) => {
-    var duongDanFile = path.join(__dirname, 'home.html')
+app.get('/home', (req, res, next) => {
+    var duongDanFile = path.join(__dirname, 'index.html')
     res.sendFile(duongDanFile)
 });
 
