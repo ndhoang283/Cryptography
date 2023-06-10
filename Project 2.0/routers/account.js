@@ -15,7 +15,15 @@ router.get('/', (req, res, next)=>{
         .skip(skip)
         .limit(PAGE_SIZE)
         .then(data=>{
-            res.json(data)
+            AccountModel.countDocuments({}).then((total)=>{
+                console.log(total);
+                var tongSoPage = Math.floor(total/PAGE_SIZE)
+                res.json({
+                    total: total,
+                    tongSoPage: tongSoPage,
+                    data: data
+                });
+            })
         })
         .catch(err=>{
             res.status(500).json
@@ -24,7 +32,7 @@ router.get('/', (req, res, next)=>{
     else {
         AccountModel.find({})
         .then(data=>{
-            res.json(data)
+            
         })
         .catch(err=>{
             res.status(500).json('Loi server')

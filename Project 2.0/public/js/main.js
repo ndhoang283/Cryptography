@@ -1,20 +1,37 @@
-function loadPage(page){
-    $.ajax({
-        url: '/api/account?page='+page,
-        type: 'GET'
-    })
-    .then(data=>{
-        $('#content').html('') // X
+$('#paging').pagination({
+    dataSource: '/account?page=1',
+    locator: 'data',
+    totalNumberLocator: function(response){
+        return response.total;
+    },
+    pageSize: 2,
+    afterPageOnClick: function(event, pageNumber){
+        loadPage(pageNumber)
+    },
+    afterPreviousOnClick: function(event,page){
+        loadPage(pageNumber);
+    },
+    afterNextOnClick: function(event, pageNumber){
+        loadPage(pageNumber);
+    }
+})
 
-        for (let i = 0; i < data.length; i++) {
-            const element = data[i];
-            
-            var item = $(`<h1>${element.username} : ${element.password}</h1>`)
-    
+function loadPage(page){
+    $('#content').html('')
+    $.ajax({
+        url: '/api/account?page='+page
+    })
+    .then(rs=>{
+        console.log(rs.tongSoPage);
+        for(let i=0; i<rs.data.length;i++){
+            const element = rs.data[i];
+            var item = $(`<h3>${element.username}</h3>`)
             $('#content').append(item)
         }
+
     })
     .catch(err=>{
-        console.log('API loi');
+        console.log(err);
     })
 }
+loadPage(1)

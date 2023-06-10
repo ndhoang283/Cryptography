@@ -2,3 +2,25 @@ h1{
     color: red;
     font-size: 50px;
 }
+
+#paging ul {
+    list-style: none;
+    display: flex;
+}
+
+#paging .paginationjs-page,
+#paging .paginationjs-ellipsis,
+#paging .paginationjs-prev,
+#paging .paginationjs-next
+{
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border: 1px solid black;
+    text-align: center;
+}
+
+#paging .active{
+    background: black;
+    color: white;
+}
