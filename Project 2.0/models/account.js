@@ -9,7 +9,8 @@ const Schema = mongoose.Schema;
 
 const AccountSchema = new Schema( {
     username: String,
-    password: String
+    password: String,
+    role: String
 }, {
     collection: 'account'
 });

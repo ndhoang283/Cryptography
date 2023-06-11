@@ -1,14 +1,14 @@
 $('#paging').pagination({
-    dataSource: '/account?page=1',
+    dataSource: '/api/account?page=1',
     locator: 'data',
     totalNumberLocator: function(response){
         return response.total;
     },
-    pageSize: 2,
+    pageSize: 5,
     afterPageOnClick: function(event, pageNumber){
         loadPage(pageNumber)
     },
-    afterPreviousOnClick: function(event,page){
+    afterPreviousOnClick: function(event,pageNumber){
         loadPage(pageNumber);
     },
     afterNextOnClick: function(event, pageNumber){
@@ -28,7 +28,6 @@ function loadPage(page){
             var item = $(`<h3>${element.username}</h3>`)
             $('#content').append(item)
         }
-
     })
     .catch(err=>{
         console.log(err);
