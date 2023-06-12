@@ -15,7 +15,7 @@ const req = require('express/lib/request')
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use('/public', express.static(path.join(__dirname, 'public')))
+app.use('/public', express.static(path.join(__dirname, '/public')))
 
 var checkLogin = (req, res, next)=>{
     try {
@@ -102,48 +102,14 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.get('/login', (req, res, next)=>{
-    res.sendFile(path.join(__dirname, 'login.html'))
-})
-
-app.post('/login', (req, res, next)=>{
-    var username = req.body.username
-    var password = req.body.password
-
-    const hmac = crypto.createHmac('sha256', privateKey);
-    hmac.update(password)
-    const hashedPassword = hmac.digest('hex')
-
-    AccountModel.findOne({
-        username: username,
-        password: hashedPassword
-    })
-    .then(data=>{
-        if(data){
-            var token = jwt.sign({
-                _id: data._id
-            }, 'mk')
-            res.json({
-                message: 'dang nhap thanh cong',
-                token: token
-            })
-        }else {
-            res.status(300).json('account khong dung')
-        }
-    })
-    .catch(err=>{
-        res.status(500).json('loi server')
-    })
-})
-
 var accountRouter = require('./routers/account');
-app.use('/api/account/', /*checkLogin, checkAdmin,*/ accountRouter)
+app.use('/api/account/', accountRouter)
 
 var goodsRouter = require('./routers/goods')
-app.use('/api/goods', /*checkLogin, checkSeller,*/ goodsRouter)
+app.use('/api/goods', goodsRouter)
 
 var invoiceRouter = require('./routers/invoice')
-app.use('/api/invoice', /*checkLogin, checkCustomer,*/ invoiceRouter)
+app.use('/api/invoice', invoiceRouter)
 
 app.listen(3000, () => {
     console.log('Server started on port 3000');

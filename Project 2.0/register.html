@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script src = "/public/js/jquery-3.7.0.min.js"></script>
+<body>
+    Username: <input type="text" id="username"> <br>
+    Password: <input type="text" id="password"> <br>
+    PasswordConfirm: <input type="text" id="PasswordConfirm"> <br>
+    Name: <input type="text" id="name"> <br>
+    Phone: <input type="text" id="phone"> <br>
+    Address: <input type="text" id="address"> <br>
+    <button onclick="register()">Register</button>
+</body>
+<div id="popup" style="display: none;">
+    <p id="popup-message"></p>
+  </div>
+<script>
+    function showPopup(message) {
+  var popup = document.getElementById("popup");
+  var popupMessage = document.getElementById("popup-message");
+  popupMessage.textContent = message;
+  popup.style.display = "block";
+}
+
+    function register() {
+        $.ajax({
+            url: '/api/account/register',
+            type: 'POST',
+            data: {
+                username: $('#username').val(),
+                password: $('#password').val(),
+                name: $('#name').val(),
+                phone: $('#phone').val(),
+                address: $('#address').val()
+            }
+            
+        }).then(data=>{
+            if (data == "Account already exists") {
+                showPopup("Account already exists")
+            }
+            else {
+                window.location.href = "/api/account/login"
+            }
+        })
+        .catch(err=>{
+            showPopup('Server error')
+        })
+    }
+</script>
+</html>

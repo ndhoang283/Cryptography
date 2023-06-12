@@ -17,7 +17,7 @@ router.get('/', (req, res, next)=>{
     var duongDanFile = path.join(__dirname, '../index.html')
     console.log("as")
     res.sendFile(duongDanFile)
-/*
+
     var page = req.query.page;
     if(page) {
         page = parseInt(page)
@@ -49,7 +49,7 @@ router.get('/', (req, res, next)=>{
         .catch(err=>{
             res.status(500).json('Loi server')
         })
-    }   */
+    }   
 })
 
 router.get('/:id', (req, res, next)=>{

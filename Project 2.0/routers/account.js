@@ -5,10 +5,134 @@ var router = express.Router();
 const AccountModel = require('../models/account');
 const { json } = require('body-parser');
 const PAGE_SIZE = 5
-var privateKey = fs.readFileSync('./key/keyforpassword.pem');
+var secretKey = fs.readFileSync('./key/keyforpassword.pem');
+var privateKey = fs.readFileSync('./key/private.pem')
+var publicKey = fs.readFileSync('./key/public.crt')
+const path = require('path')
+const jwt = require('jsonwebtoken')
+const cookieParser = require('cookie-parser')
+
+router.use('/public', express.static(path.join(__dirname, '../public')))
+
+var checkLogin = (req, res, next)=>{
+    try {
+        var token = req.cookies.token
+        var idUser = jwt.verify(token, publicKey)
+        AccountModel.findOne( {
+            _id: idUser
+        })
+        .then(data=>{
+            if(data){
+                req.data = data
+                next()
+            }else{
+                res.json('not permisions')
+            }
+        })
+        .catch(err=>{
+
+        })
+    } catch (err) {
+        res.status(500).json('token khong hop le')
+    }
+}
+
+var checkCustomer = (req, res, next)=>{
+    var role = req.data.role
+    if(role >= 0) {
+        next()
+    } else {
+        res.json('not permision')
+    }
+}
+
+var checkSeller = (req, res, next)=>{
+    var role = req.data.role
+    if(role >= 1) {
+        next()
+    } else {
+        res.json('not permision')
+    }
+}
+
+var checkAdmin = (req, res, next)=>{
+    var role = req.data.role
+    if(role >= 2) {
+        next()
+    } else {
+        res.json('not permision')
+    }
+}
+
+router.get('/login', (req, res, next)=>{
+    res.sendFile(path.join(__dirname, '../login.html'))
+})
+
+router.post('/login', (req, res, next)=>{
+    var username = req.body.username
+    var password = req.body.password
+
+    const hmac = crypto.createHmac('sha256', secretKey);
+    hmac.update(password)
+    const hashedPassword = hmac.digest('hex')
+
+    AccountModel.findOne({
+        username: username,
+        password: hashedPassword
+    })
+    .then(data=>{
+        if(data){
+            var token = jwt.sign({
+                _id: data._id
+            }, privateKey, { algorithm: 'RS256' })
+            res.json({
+                message: 'ok',
+                token: token
+            })
+        }else {
+            res.status(300).json('fail')
+        }
+    })
+    .catch(err=>{
+        res.status(500).json('loi server')
+    })
+})
+
+router.get('/register', (req, res, next)=>{
+    res.sendFile(path.join(__dirname, '../register.html'))
+})
+router.post('/register', async (req, res) => {
+    try {
+        const username = req.body.username;
+        const password = req.body.password;
+        const name = req.body.name
+        const phone = req.body.phone
+        const address = req.body.address
+
+        const data = await AccountModel.findOne({ username: username });
+        if (data) {
+            return res.json('Account already exists');
+        } else {
+            const hmac = crypto.createHmac('sha256', secretKey);
+            hmac.update(password)
+            const hashedPassword = hmac.digest('hex')
+
+            await AccountModel.create({
+                username: username,
+                password: hashedPassword,
+                name: name,
+                phone: phone,
+                address: address
+            });
+            return res.json('Account created successfully');
+        }
+    } catch (err) {
+        return res.status(500).json('Server error');
+    }
+});
 
 // lay du lieu tu db
-router.get('/', (req, res, next)=>{
+router.get('/getAll', checkLogin, (req, res, next)=>{
     var page = req.query.page;
     if(page) {
         page = parseInt(page)
@@ -43,10 +167,11 @@ router.get('/', (req, res, next)=>{
     }   
 })
 
-router.get('/:id', (req, res, next)=>{
-    var id = req.params.id
+router.get('/my', (req, res, next)=>{
+    var token = req.cookies.token
+    var idUser = jwt.verify(token, publicKey)
 
-    AccountModel.findById(id)
+    AccountModel.findById(idUser)
     .then(data=>{
         res.json(data)
     })
@@ -56,7 +181,7 @@ router.get('/:id', (req, res, next)=>{
 })
 
 // them moi du lieu vao db
-router.post('/', (req, res, next)=>{
+router.post('/create', checkLogin, checkAdmin, (req, res, next)=>{
     var username = req.body.username
     var password = req.body.password
     var name = req.body.name
@@ -64,7 +189,7 @@ router.post('/', (req, res, next)=>{
     var address = req.body.address
     var role = req.role
 
-    const hmac = crypto.createHmac('sha256', privateKey);
+    const hmac = crypto.createHmac('sha256', secretKey);
     hmac.update(password)
     const hashedPassword = hmac.digest('hex')
 
@@ -85,15 +210,15 @@ router.post('/', (req, res, next)=>{
 })
 
 // update du lieu trong db
-router.put('/:id', (req, res, next)=>{
-    var id = req.params.id
+router.put('/update', checkLogin, checkAdmin, (req, res, next)=>{
+    var id = req.body.id
     var newPassword = req.body.newPassword
     var name = req.body.name
     var phone = req.body.phone
     var address = req.body.address
     var role = req.body.role
 
-    const hmac = crypto.createHmac('sha256', privateKey);
+    const hmac = crypto.createHmac('sha256', secretKey);
     hmac.update(password)
     const hashedPassword = hmac.digest('hex')
 
@@ -113,8 +238,8 @@ router.put('/:id', (req, res, next)=>{
 })
 
 // xoa du lieu trong db
-router.delete('/:id', (req, res, next)=>{
-    var id = req.params.id
+router.delete('/delete', checkLogin, checkAdmin, (req, res, next)=>{
+    var id = req.body.id
 
     AccountModel.deleteOne({
         _id: id
@@ -127,4 +252,8 @@ router.delete('/:id', (req, res, next)=>{
     })
 })
 
-module.exports = router
+router.get('/admin', checkLogin, checkAdmin, (req, res, next)=>{
+    res.sendFile(path.join(__dirname, '../admin.html'))
+})
+
+module.exports = router;

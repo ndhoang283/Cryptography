@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
-<script src = "./public/js/jquery-3.7.0.min.js"></script>
+<script src = "/public/js/jquery-3.7.0.min.js"></script>
 <body>
     Username: <input type="text" id="username"> <br>
     Password: <input type="text" id="password"> <br>
     <button onclick="login()">Login</button>
 </body>
+<div id="popup" style="display: none;">
+  <p id="popup-message"></p>
+</div>
 <script>
     function setCookie(cname, cvalue, exdays) {
   const d = new Date();
@@ -35,20 +38,33 @@ function getCookie(cname) {
   return "";
 }
 
+function showPopup(message) {
+  var popup = document.getElementById("popup");
+  var popupMessage = document.getElementById("popup-message");
+  popupMessage.textContent = message;
+  popup.style.display = "block";
+}
+
     function login() {
         $.ajax({
-            url: '/login',
+            url: '/api/account/login',
             type: 'POST',
             data: {
                 username: $('#username').val(),
                 password: $('#password').val()
             }
         }).then(data=>{
+          if (data.message == 'ok') {
             setCookie('token', data.token, 1)
-            window.location.href = "/home"
+            window.location.href = '/home'
+          }
+          else {
+            showPopup('Invalid account')
+          }  
         })
-        .catch(err=>{
-            console.log(err);
+        .catch(err=>
+        {
+          showPopup('Server Error')
         })
     }
 </script>
