@@ -2,27 +2,43 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const AccountModel = require('./models/account');
+const GoodsModel = require('./models/goods')
 const path = require('path')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
+const crypto = require('crypto')
+var fs = require('fs')
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/public', express.static(path.join(__dirname, 'public')))
 
+var privateKey = fs.readFileSync('./key/keyforpassword.pem');
+
+
 app.post('/register', async (req, res) => {
     try {
         const username = req.body.username;
         const password = req.body.password;
+        const name = req.body.name
+        const phone = req.body.phone
+        const address = req.body.address
 
         const data = await AccountModel.findOne({ username: username });
         if (data) {
             return res.json('user nay da ton tai');
         } else {
+            const hmac = crypto.createHmac('sha256', privateKey);
+            hmac.update(password)
+            const hashedPassword = hmac.digest('hex')
+
             await AccountModel.create({
                 username: username,
-                password: password
+                password: hashedPassword,
+                name: name,
+                phone: phone,
+                address: address
             });
             return res.json('Tao tai khoan thanh cong');
         }
@@ -37,34 +53,18 @@ app.get('/login', (req, res, next)=>{
     res.sendFile(path.join(__dirname, 'login.html'))
 })
 
-/*app.get('/home', (req, res, next)=>{
-    var token = req.cookies.token;
-    var decodeToken = jwt.verify(token, 'mk')
-    AccountModel.find({_id:decodeToken._id})
-    .then(function(data){
-        if(data.length==0) {
-            return res.redirect('/login')
-        }else{
-            if(data[0].role == 2) {
-                next()
-            }else{
-                return res.redirect('/login')
-            }
-        }
-    })
-}, (req, res, next)=>{
-    res.sendFile(path.join(__dirname, 'home.html'))
-})*/
-
-
 // POST Login
 app.post('/login', (req, res, next)=>{
     var username = req.body.username
     var password = req.body.password
 
+    const hmac = crypto.createHmac('sha256', privateKey);
+    hmac.update(password)
+    const hashedPassword = hmac.digest('hex')
+
     AccountModel.findOne({
         username: username,
-        password: password
+        password: hashedPassword
     })
     .then(data=>{
         if(data){
@@ -84,9 +84,10 @@ app.post('/login', (req, res, next)=>{
     })
 })
 
-var accountRouter = require('./routers/account')
+var accountRouter = require('./routers/account');
+const req = require('express/lib/request');
 
-app.use('/api/account/', accountRouter)
+
 
 app.get('/home', (req, res, next) => {
     var duongDanFile = path.join(__dirname, 'index.html')
@@ -116,7 +117,7 @@ var checkLogin = (req, res, next)=>{
     }
 }
 
-var checkStudent = (req, res, next)=>{
+var checkCustomer = (req, res, next)=>{
     var role = req.data.role
     if(role >= 0) {
         next()
@@ -125,7 +126,7 @@ var checkStudent = (req, res, next)=>{
     }
 }
 
-var checkTeacher = (req, res, next)=>{
+var checkSeller = (req, res, next)=>{
     var role = req.data.role
     if(role >= 1) {
         next()
@@ -134,7 +135,7 @@ var checkTeacher = (req, res, next)=>{
     }
 }
 
-var checkManager = (req, res, next)=>{
+var checkAdmin = (req, res, next)=>{
     var role = req.data.role
     if(role >= 2) {
         next()
@@ -142,7 +143,7 @@ var checkManager = (req, res, next)=>{
         res.json('not permision')
     }
 }
-
+/*
 app.get('/task', checkLogin, checkStudent, (req, res, next)=>{
     console.log(req.data)
     res.json('all task')
@@ -158,7 +159,12 @@ app.get('/teacher', checkLogin, checkManager, (req, res, next)=>{
     next()
 }, (req, res, next)=>{
     res.json('TEACHER')
-})
+})*/
+
+var goodsRouter = require('./routers/goods')
+app.use('/api/goods', checkLogin, checkSeller, goodsRouter)
+
+app.use('/api/account/', checkLogin, checkAdmin, accountRouter)
 
 app.listen(3000, () => {
     console.log('Server started on port 3000');

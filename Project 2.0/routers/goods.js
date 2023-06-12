@@ -1,11 +1,8 @@
 const express = require('express');
-const crypto = require('crypto')
-var fs = require('fs')
 var router = express.Router();
-const AccountModel = require('../models/account');
 const { json } = require('body-parser');
+const GoodsModel = require('../models/goods.js');
 const PAGE_SIZE = 5
-var privateKey = fs.readFileSync('./key/keyforpassword.pem');
 
 // lay du lieu tu db
 router.get('/', (req, res, next)=>{
@@ -14,11 +11,11 @@ router.get('/', (req, res, next)=>{
         page = parseInt(page)
         var skip = (page - 1) * PAGE_SIZE
 
-        AccountModel.find({})
+        GoodsModel.find({})
         .skip(skip)
         .limit(PAGE_SIZE)
         .then(data=>{
-            AccountModel.countDocuments({}).then((total)=>{
+            GoodsModel.countDocuments({}).then((total)=>{
                 console.log(total);
                 var tongSoPage = Math.floor(total/PAGE_SIZE)
                 res.json({
@@ -33,7 +30,7 @@ router.get('/', (req, res, next)=>{
         })
     }
     else {
-        AccountModel.find({})
+        GoodsModel.find({})
         .then(data=>{
             res.json(data)
         })
@@ -46,7 +43,7 @@ router.get('/', (req, res, next)=>{
 router.get('/:id', (req, res, next)=>{
     var id = req.params.id
 
-    AccountModel.findById(id)
+    GoodsModel.findById(id)
     .then(data=>{
         res.json(data)
     })
@@ -57,27 +54,17 @@ router.get('/:id', (req, res, next)=>{
 
 // them moi du lieu vao db
 router.post('/', (req, res, next)=>{
-    var username = req.body.username
-    var password = req.body.password
     var name = req.body.name
-    var phone = req.body.phone
-    var address = req.body.address
-    var role = req.role
+    var type = req.body.type
+    var quantity = req.body.quantity
 
-    const hmac = crypto.createHmac('sha256', privateKey);
-    hmac.update(password)
-    const hashedPassword = hmac.digest('hex')
-
-    AccountModel.create({
-        username: username,
-        password: hashedPassword,
+    GoodsModel.create({
         name: name,
-        phone:phone,
-        address: address,
-        roler: role
+        type: type,
+        quantity: quantity
     })
     .then(data=>{
-        res.json('them account thanh cong')
+        res.json('them mat hang thanh cong')
     })
     .catch(err=>{
         res.status(500).json('loi server')
@@ -87,22 +74,10 @@ router.post('/', (req, res, next)=>{
 // update du lieu trong db
 router.put('/:id', (req, res, next)=>{
     var id = req.params.id
-    var newPassword = req.body.newPassword
-    var name = req.body.name
-    var phone = req.body.phone
-    var address = req.body.address
-    var role = req.body.role
+    var newtype = req.body.newtype
 
-    const hmac = crypto.createHmac('sha256', privateKey);
-    hmac.update(password)
-    const hashedPassword = hmac.digest('hex')
-
-    AccountModel.findByIdAndUpdate(id, {
-        password: hashedPassword,
-        name: name,
-        phone:phone,
-        address: address,
-        roler: role
+    GoodsModel.findByIdAndUpdate(id, {
+        type: newtype
     })
     .then(data=>{
         res.json('update thanh cong')
@@ -116,7 +91,7 @@ router.put('/:id', (req, res, next)=>{
 router.delete('/:id', (req, res, next)=>{
     var id = req.params.id
 
-    AccountModel.deleteOne({
+    GoodsModel.deleteOne({
         _id: id
     })
     .then(data=>{
