@@ -1,33 +1,21 @@
 const express = require('express');
 var router = express.Router();
 const { json } = require('body-parser');
-const path = require('path')
-const GoodsModel = require('../models/goods.js');
+const InvoiceModel = require('../models/invoice.js');
 const PAGE_SIZE = 5
-
-router.use('/public', express.static(path.join(__dirname, 'public')))
 
 // lay du lieu tu db
 router.get('/', (req, res, next)=>{
-    var duongDanFile = path.join(__dirname, '../index.html')
-    console.log(duongDanFile)
-    res.sendFile(duongDanFile)
-})
-router.get('/', (req, res, next)=>{
-    var duongDanFile = path.join(__dirname, '../index.html')
-    console.log("as")
-    res.sendFile(duongDanFile)
-/*
     var page = req.query.page;
     if(page) {
         page = parseInt(page)
         var skip = (page - 1) * PAGE_SIZE
 
-        GoodsModel.find({})
+        InvoiceModel.find({})
         .skip(skip)
         .limit(PAGE_SIZE)
         .then(data=>{
-            GoodsModel.countDocuments({}).then((total)=>{
+            InvoiceModel.countDocuments({}).then((total)=>{
                 console.log(total);
                 var tongSoPage = Math.floor(total/PAGE_SIZE)
                 res.json({
@@ -42,20 +30,20 @@ router.get('/', (req, res, next)=>{
         })
     }
     else {
-        GoodsModel.find({})
+        InvoiceModel.find({})
         .then(data=>{
             res.json(data)
         })
         .catch(err=>{
             res.status(500).json('Loi server')
         })
-    }   */
+    }   
 })
 
 router.get('/:id', (req, res, next)=>{
     var id = req.params.id
 
-    GoodsModel.findById(id)
+    InvoiceModel.findById(id)
     .then(data=>{
         res.json(data)
     })
@@ -66,17 +54,17 @@ router.get('/:id', (req, res, next)=>{
 
 // them moi du lieu vao db
 router.post('/', (req, res, next)=>{
-    var name = req.body.name
-    var type = req.body.type
+    var customer = req.body.customer
+    var product = req.body.product
     var quantity = req.body.quantity
 
-    GoodsModel.create({
-        name: name,
-        type: type,
+    InvoiceModel.create({
+        customer: customer,
+        product: product,
         quantity: quantity
     })
     .then(data=>{
-        res.json('them mat hang thanh cong')
+        res.json('them hoa don thanh cong')
     })
     .catch(err=>{
         res.status(500).json('loi server')
@@ -86,10 +74,10 @@ router.post('/', (req, res, next)=>{
 // update du lieu trong db
 router.put('/:id', (req, res, next)=>{
     var id = req.params.id
-    var newtype = req.body.newtype
+    var newproduct = req.body.newproduct
 
-    GoodsModel.findByIdAndUpdate(id, {
-        type: newtype
+    InvoiceModel.findByIdAndUpdate(id, {
+        product: newproduct
     })
     .then(data=>{
         res.json('update thanh cong')
@@ -103,7 +91,7 @@ router.put('/:id', (req, res, next)=>{
 router.delete('/:id', (req, res, next)=>{
     var id = req.params.id
 
-    GoodsModel.deleteOne({
+    InvoiceModel.deleteOne({
         _id: id
     })
     .then(data=>{
