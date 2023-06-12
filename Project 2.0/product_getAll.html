@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Use JavaScript to dynamically generate rows for each product -->
+        </tbody>
+    </table>
+    <script>
+        // Make a GET request to fetch product data
+        fetch('/api/product/', { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                // Loop through the product data and generate rows for each product
+                data.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${product._id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.price}</td>
+                        <td>${product.quantity}</td>
+                    `;
+                    document.querySelector('tbody').appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    </script>     
+</body>
+</html>

@@ -3,17 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script
-  src="https://code.jquery.com/jquery-3.7.0.min.js"
-  integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
-  crossorigin="anonymous"></script>
+    <title>Home</title>
 </head>
 <body>
-    day la trang home
-    <button> edit </button>
+    <h1>Welcome to the Home Page</h1>
+
+    <button onclick="goToCustomerHome()">Customer Home</button>
+    <button onclick="goToSellerHome()">Seller Home</button>
+    <button onclick="goToAdminHome()">Admin Home</button>
+    <button onclick="logIn()">Log In</button>
+    <button onclick="logOut()">Log Out</button>
+
+    <script>
+        function goToCustomerHome() {
+            // Redirect to customer home page
+            window.location.href = "/customer-home.html";
+        }
+
+        function goToSellerHome() {
+            // Redirect to seller home page
+            window.location.href = "/seller-home.html";
+        }
+
+        function goToAdminHome() {
+            // Redirect to admin home page
+            window.location.href = "/api/account/admin";
+        }
+
+        function logIn() {
+            // Redirect to admin home page
+            window.location.href = "/api/account/login";
+        }
+
+        function logOut() {
+            // Perform logout logic here
+            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+            // Redirect to login page
+            window.location.href = "/api/account/login";
+        }
+    </script>
 </body>
-<script>
-    
-</script>
 </html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Account</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Account</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+        <tbody id="accountInfo">
+            <!-- Account information will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <script>
+        // Make a GET request to fetch the account information
+        fetch('/api/account/my', { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                const account = data;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${account._id}</td>
+                    <td>${account.username}</td>
+                    <td>${account.name}</td>
+                    <td>${account.phone}</td>
+                    <td>${account.address}</td>
+                `;
+                document.getElementById('accountInfo').appendChild(row);
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>

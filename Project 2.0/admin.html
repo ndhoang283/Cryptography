@@ -3,16 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Admin Manager</title>
+    <script src="/public/js/jquery-3.7.0.min.js"></script>
 </head>
 <body>
-    <button onclick="viewAccount()">View account</button>
+    <h1>Admin Manager</h1>
 
+    <button onclick="viewAccount()">View all account</button><br><br>
+
+    <button onclick="viewProfile()">View my profile</button><br><br>
+
+    <button onclick="viewAllInvoice()">View all invoice</button><br><br>
+
+    <button onclick="viewAllProduct()">View all product</button><br><br>
+
+    Set role: <br>
+    id: <input type="text" id="id"> <br>
+    role: <input type="number" id="role"> <br>
+    <button onclick="setRole()">Set role</button><br><br>
+
+    Delete account <br>
+    id: <input type="text" id="id_delete"> <br>
+    <button onclick="deleteAccount()">Delete account</button><br><br>
     
+    <button onclick="home()">Home</button><br><br>
+    
+    <div id="popup" style="display: none;">
+        <p id="popup-message"></p>
+    </div>
+
+    <script>
+        function showPopup(message) {
+            var popup = document.getElementById("popup");
+            var popupMessage = document.getElementById("popup-message");
+            popupMessage.textContent = message;
+            popup.style.display = "block";
+        }
+
+        function hidePopup() {
+            var popup = document.getElementById("popup");
+            popup.style.display = "none";
+        }
+
+        function viewAccount() {
+            window.location.href = '/api/account/getAll';
+        }
+
+        function viewProfile() {
+            window.location.href = '/api/account/getMy';
+        }
+
+        function viewAllInvoice() {
+            window.location.href = '/api/invoice/getAll';
+        }
+
+        function viewAllProduct() {
+            window.location.href = '/api/product/getAll';
+        }
+
+        function home() {
+            window.location.href = '/home';
+        }
+
+        function setRole() {
+            hidePopup();
+            $.ajax({
+                url: '/api/account/setRole',
+                type: 'POST',
+                data: {
+                    id: $('#id').val(),
+                    role: $('#role').val()
+                }
+            }).then(data => {
+                if (data === 'ok') {
+                    showPopup('Set success');
+                    $('#id').val('');
+                    $('#role').val('');
+                } else {
+                    showPopup('Set fail');
+                }
+            }).catch(err => {
+                showPopup('Set fail');
+            });
+        }
+
+        function deleteAccount() {
+            hidePopup();
+            $.ajax({
+                url: '/api/account/delete',
+                type: 'POST',
+                data: {
+                    id: $('#id_delete').val()
+                }
+            }).then(data => {
+                if (data === 'ok') {
+                    showPopup('Delete success');
+                    $('#id_delete').val('');
+                } else {
+                    showPopup('Delete fail');
+                }
+            }).catch(err => {
+                showPopup('Delete fail');
+            });
+        }
+    </script>
 </body>
-<script>
-    function viewAccount() {
-        window.location.href = '/api/account/getAll'
-    }
-</script>
 </html>

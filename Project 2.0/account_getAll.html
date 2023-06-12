@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Account List</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Account List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Use JavaScript to dynamically generate rows for each account -->
+        </tbody>
+    </table>
+
+    <script>
+        // Make a GET request to fetch account data
+        fetch('/api/account', { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                // Loop through the account data and generate rows for each account
+                data.forEach(account => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${account._id}</td>
+                        <td>${account.username}</td>
+                        <td>${account.name}</td>
+                        <td>${account.phone}</td>
+                        <td>${account.address}</td>
+                    `;
+                    document.querySelector('tbody').appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>

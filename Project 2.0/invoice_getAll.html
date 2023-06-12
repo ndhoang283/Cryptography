@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice List</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Invoice List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Use JavaScript to dynamically generate rows for each invoice -->
+        </tbody>
+    </table>
+    <script>
+        // Make a GET request to fetch invoice data
+        fetch('/api/invoice/', { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                // Loop through the invoice data and generate rows for each invoice
+                data.forEach(invoice => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${invoice._id}</td>
+                        <td>${invoice.customer}</td>
+                        <td>${invoice.product}</td>
+                        <td>${invoice.quantity}</td>
+                        <td>${invoice.ammout}</td>
+                    `;
+                    document.querySelector('tbody').appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    </script>     
+</body>
+</html>

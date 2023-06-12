@@ -2,7 +2,7 @@ const express = require('express');
 const crypto = require('crypto')
 var fs = require('fs')
 var router = express.Router();
-const AccountModel = require('../models/account');
+const AccountModel = require('../models/account.js');
 const { json } = require('body-parser');
 const PAGE_SIZE = 5
 var secretKey = fs.readFileSync('./key/keyforpassword.pem');
@@ -132,42 +132,45 @@ router.post('/register', async (req, res) => {
 });
 
 // lay du lieu tu db
-router.get('/getAll', checkLogin, (req, res, next)=>{
+router.get('/', checkLogin, checkAdmin, (req, res, next) => {
     var page = req.query.page;
-    if(page) {
-        page = parseInt(page)
-        var skip = (page - 1) * PAGE_SIZE
+    if (page) {
+        page = parseInt(page);
+        var skip = (page - 1) * PAGE_SIZE;
 
         AccountModel.find({})
-        .skip(skip)
-        .limit(PAGE_SIZE)
-        .then(data=>{
-            AccountModel.countDocuments({}).then((total)=>{
-                console.log(total);
-                var tongSoPage = Math.floor(total/PAGE_SIZE)
-                res.json({
-                    total: total,
-                    tongSoPage: tongSoPage,
-                    data: data
+            .skip(skip)
+            .limit(PAGE_SIZE)
+            .then(data => {
+                AccountModel.countDocuments({}).then(total => {
+                    var tongSoPage = Math.floor(total / PAGE_SIZE);
+                    res.json({
+                        total: total,
+                        tongSoPage: tongSoPage,
+                        data: data
+                    });
                 });
             })
-        })
-        .catch(err=>{
-            res.status(500).json
-        })
-    }
-    else {
+            .catch(err => {
+                res.status(500).json('Lỗi server');
+            });
+    } else {
         AccountModel.find({})
-        .then(data=>{
-            res.json(data)
-        })
-        .catch(err=>{
-            res.status(500).json('Loi server')
-        })
-    }   
-})
+            .then(data => {
+                res.json(data);
+            })
+            .catch(err => {
+                res.status(500).json('Lỗi server');
+            });
+    }
+});
 
-router.get('/my', (req, res, next)=>{
+router.get('/getAll', checkLogin, checkAdmin, (req, res, next) => {
+    res.sendFile(path.join(__dirname, '../account_getAll.html'));
+});
+
+
+router.get('/my', checkLogin, (req, res, next)=>{
     var token = req.cookies.token
     var idUser = jwt.verify(token, publicKey)
 
@@ -178,6 +181,10 @@ router.get('/my', (req, res, next)=>{
     .catch(err=>{
         res.status(500).json('Loi server')
     })
+})
+
+router.get('/getMy', checkLogin, (req, res, next)=>{
+    res.sendFile(path.join(__dirname, '../account_my.html'));
 })
 
 // them moi du lieu vao db
@@ -210,7 +217,7 @@ router.post('/create', checkLogin, checkAdmin, (req, res, next)=>{
 })
 
 // update du lieu trong db
-router.put('/update', checkLogin, checkAdmin, (req, res, next)=>{
+router.put('/changPassword', checkLogin, checkAdmin, (req, res, next)=>{
     var id = req.body.id
     var newPassword = req.body.newPassword
     var name = req.body.name
@@ -219,7 +226,7 @@ router.put('/update', checkLogin, checkAdmin, (req, res, next)=>{
     var role = req.body.role
 
     const hmac = crypto.createHmac('sha256', secretKey);
-    hmac.update(password)
+    hmac.update(newPassword)
     const hashedPassword = hmac.digest('hex')
 
     AccountModel.findByIdAndUpdate(id, {
@@ -227,7 +234,7 @@ router.put('/update', checkLogin, checkAdmin, (req, res, next)=>{
         name: name,
         phone:phone,
         address: address,
-        roler: role
+        role: role
     })
     .then(data=>{
         res.json('update thanh cong')
@@ -237,18 +244,33 @@ router.put('/update', checkLogin, checkAdmin, (req, res, next)=>{
     })
 })
 
+router.post('/setRole', (req, res, next)=>{
+    var id = req.body.id
+    var role = req.body.role
+
+    AccountModel.findByIdAndUpdate(id, {
+        role: role
+    })
+    .then(data=>{
+        res.json('ok')
+    })
+    .catch(err=>{
+        res.status(500).json('fail')
+    })
+})
+
 // xoa du lieu trong db
-router.delete('/delete', checkLogin, checkAdmin, (req, res, next)=>{
+router.post('/delete', checkLogin, checkAdmin, (req, res, next)=>{
     var id = req.body.id
 
     AccountModel.deleteOne({
         _id: id
     })
     .then(data=>{
-        res.json('xoa thanh cong')
+        res.json('ok')
     })
     .catch(err=>{
-        res.status(500).json('loi server')
+        res.status(500).json('fail')
     })
 })
 

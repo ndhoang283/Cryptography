@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const AccountModel = require('./models/account');
-const GoodsModel = require('./models/goods')
+const GoodsModel = require('./models/product')
 const Invoice = require('./models/invoice')
 const path = require('path')
 const jwt = require('jsonwebtoken')
@@ -68,45 +68,15 @@ var checkAdmin = (req, res, next)=>{
 }
 
 app.get('/home', (req, res, next) => {
-    var duongDanFile = path.join(__dirname, 'index.html')
+    var duongDanFile = path.join(__dirname, 'home.html')
     res.sendFile(duongDanFile)
-});
-
-app.post('/register', async (req, res) => {
-    try {
-        const username = req.body.username;
-        const password = req.body.password;
-        const name = req.body.name
-        const phone = req.body.phone
-        const address = req.body.address
-
-        const data = await AccountModel.findOne({ username: username });
-        if (data) {
-            return res.json('user nay da ton tai');
-        } else {
-            const hmac = crypto.createHmac('sha256', privateKey);
-            hmac.update(password)
-            const hashedPassword = hmac.digest('hex')
-
-            await AccountModel.create({
-                username: username,
-                password: hashedPassword,
-                name: name,
-                phone: phone,
-                address: address
-            });
-            return res.json('Tao tai khoan thanh cong');
-        }
-    } catch (err) {
-        return res.status(500).json('Tao tai khoan that bai');
-    }
 });
 
 var accountRouter = require('./routers/account');
 app.use('/api/account/', accountRouter)
 
-var goodsRouter = require('./routers/goods')
-app.use('/api/goods', goodsRouter)
+var productRouter = require('./routers/product')
+app.use('/api/product', productRouter)
 
 var invoiceRouter = require('./routers/invoice')
 app.use('/api/invoice', invoiceRouter)

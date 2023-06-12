@@ -7,15 +7,15 @@ mongoose.connect('mongodb://127.0.0.1:27017/MyDB', {
 
 const Schema = mongoose.Schema;
 
-const InvoiceSchema = new Schema({
-    customer: String,
-    product: String,
+const ProductSchema = new Schema({
+    name: String,
+    seller: String,
     quantity: Number,
-    ammout: Number
+    price: Number
 }, {
-    collection: 'invoice'
+    collection: 'product'
 });
 
-const InvoiceModel = mongoose.model('invoice', InvoiceSchema);
+const ProductModel = mongoose.model('product', ProductSchema);
 
-module.exports = InvoiceModel;
+module.exports = ProductModel;

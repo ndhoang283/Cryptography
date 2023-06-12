@@ -1,33 +1,81 @@
 const express = require('express');
+const crypto = require('crypto')
 var router = express.Router();
-const { json } = require('body-parser');
 const path = require('path')
-const GoodsModel = require('../models/goods.js');
+var fs = require('fs')
+const ProductModel = require('../models/product.js');
+const AccountModel = require('../models/account.js');
+const { json } = require('body-parser');
+var publicKey = fs.readFileSync('./key/public.crt')
+const jwt = require('jsonwebtoken')
+const cookieParser = require('cookie-parser')
 const PAGE_SIZE = 5
 
 router.use('/public', express.static(path.join(__dirname, 'public')))
+router.use(cookieParser());
+
+var checkLogin = (req, res, next)=>{
+    try {
+        var token = req.cookies.token
+        var idUser = jwt.verify(token, publicKey)
+        AccountModel.findOne( {
+            _id: idUser
+        })
+        .then(data=>{
+            if(data){
+                req.data = data
+                next()
+            }else{
+                res.json('not permisions')
+            }
+        })
+        .catch(err=>{
+
+        })
+    } catch (err) {
+        res.status(500).json('token khong hop le')
+    }
+}
+
+var checkCustomer = (req, res, next)=>{
+    var role = req.data.role
+    if(role >= 0) {
+        next()
+    } else {
+        res.json('not permision')
+    }
+}
+
+var checkSeller = (req, res, next)=>{
+    var role = req.data.role
+    if(role >= 1) {
+        next()
+    } else {
+        res.json('not permision')
+    }
+}
+
+var checkAdmin = (req, res, next)=>{
+    var role = req.data.role
+    if(role >= 2) {
+        next()
+    } else {
+        res.json('not permision')
+    }
+}
 
 // lay du lieu tu db
-router.get('/', (req, res, next)=>{
-    var duongDanFile = path.join(__dirname, '../index.html')
-    console.log(duongDanFile)
-    res.sendFile(duongDanFile)
-})
-router.get('/', (req, res, next)=>{
-    var duongDanFile = path.join(__dirname, '../index.html')
-    console.log("as")
-    res.sendFile(duongDanFile)
-
+router.get('/', checkLogin, checkAdmin, (req, res, next)=>{
     var page = req.query.page;
     if(page) {
         page = parseInt(page)
         var skip = (page - 1) * PAGE_SIZE
 
-        GoodsModel.find({})
+        ProductModel.find({})
         .skip(skip)
         .limit(PAGE_SIZE)
         .then(data=>{
-            GoodsModel.countDocuments({}).then((total)=>{
+            ProductModel.countDocuments({}).then((total)=>{
                 console.log(total);
                 var tongSoPage = Math.floor(total/PAGE_SIZE)
                 res.json({
@@ -42,7 +90,7 @@ router.get('/', (req, res, next)=>{
         })
     }
     else {
-        GoodsModel.find({})
+        ProductModel.find({})
         .then(data=>{
             res.json(data)
         })
@@ -52,10 +100,14 @@ router.get('/', (req, res, next)=>{
     }   
 })
 
+router.get('/getAll', checkLogin, checkAdmin, (req, res, next)=>{
+    res.sendFile(path.join(__dirname, '../product_getAll.html'))
+})
+
 router.get('/:id', (req, res, next)=>{
     var id = req.params.id
 
-    GoodsModel.findById(id)
+    ProductModel.findById(id)
     .then(data=>{
         res.json(data)
     })
@@ -67,13 +119,15 @@ router.get('/:id', (req, res, next)=>{
 // them moi du lieu vao db
 router.post('/', (req, res, next)=>{
     var name = req.body.name
-    var type = req.body.type
+    var seller = req.body.seller
     var quantity = req.body.quantity
+    var price = req.body.price
 
-    GoodsModel.create({
+    ProductModel.create({
         name: name,
-        type: type,
-        quantity: quantity
+        seller: seller,
+        quantity: quantity,
+        price: price
     })
     .then(data=>{
         res.json('them mat hang thanh cong')
@@ -88,7 +142,7 @@ router.put('/:id', (req, res, next)=>{
     var id = req.params.id
     var newtype = req.body.newtype
 
-    GoodsModel.findByIdAndUpdate(id, {
+    ProductModel.findByIdAndUpdate(id, {
         type: newtype
     })
     .then(data=>{
@@ -103,7 +157,7 @@ router.put('/:id', (req, res, next)=>{
 router.delete('/:id', (req, res, next)=>{
     var id = req.params.id
 
-    GoodsModel.deleteOne({
+    ProductModel.deleteOne({
         _id: id
     })
     .then(data=>{
