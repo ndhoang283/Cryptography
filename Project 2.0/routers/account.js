@@ -39,7 +39,7 @@ var checkLogin = (req, res, next)=>{
 
 var checkCustomer = (req, res, next)=>{
     var role = req.data.role
-    if(role >= 0) {
+    if(role == 0) {
         next()
     } else {
         res.json('not permision')
@@ -48,7 +48,7 @@ var checkCustomer = (req, res, next)=>{
 
 var checkSeller = (req, res, next)=>{
     var role = req.data.role
-    if(role >= 1) {
+    if(role == 1) {
         next()
     } else {
         res.json('not permision')
@@ -57,7 +57,7 @@ var checkSeller = (req, res, next)=>{
 
 var checkAdmin = (req, res, next)=>{
     var role = req.data.role
-    if(role >= 2) {
+    if(role == 2) {
         next()
     } else {
         res.json('not permision')
@@ -217,9 +217,10 @@ router.post('/create', checkLogin, checkAdmin, (req, res, next)=>{
 })
 
 // update du lieu trong db
-router.put('/changPassword', checkLogin, checkAdmin, (req, res, next)=>{
-    var id = req.body.id
-    var newPassword = req.body.newPassword
+router.put('/', checkLogin, (req, res, next)=>{
+    var token = req.cookies.token
+    var id = jwt.verify(token, publicKey)
+    var newPassword = req.body.password
     var name = req.body.name
     var phone = req.body.phone
     var address = req.body.address
@@ -276,6 +277,14 @@ router.post('/delete', checkLogin, checkAdmin, (req, res, next)=>{
 
 router.get('/admin', checkLogin, checkAdmin, (req, res, next)=>{
     res.sendFile(path.join(__dirname, '../admin.html'))
+})
+
+router.get('/seller', checkLogin, checkSeller, (req, res, next)=>{
+    res.sendFile(path.join(__dirname, '../seller.html'))
+})
+
+router.get('/customer', checkLogin, checkCustomer, (req, res, next)=>{
+    res.sendFile(path.join(__dirname, '../customer.html'))
 })
 
 module.exports = router;

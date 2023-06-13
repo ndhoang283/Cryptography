@@ -39,7 +39,7 @@ var checkLogin = (req, res, next)=>{
 
 var checkCustomer = (req, res, next)=>{
     var role = req.data.role
-    if(role >= 0) {
+    if(role == 0) {
         next()
     } else {
         res.json('not permision')
@@ -48,7 +48,7 @@ var checkCustomer = (req, res, next)=>{
 
 var checkSeller = (req, res, next)=>{
     var role = req.data.role
-    if(role >= 1) {
+    if(role == 1) {
         next()
     } else {
         res.json('not permision')
@@ -57,7 +57,7 @@ var checkSeller = (req, res, next)=>{
 
 var checkAdmin = (req, res, next)=>{
     var role = req.data.role
-    if(role >= 2) {
+    if(role == 2) {
         next()
     } else {
         res.json('not permision')
@@ -104,16 +104,20 @@ router.get('/getAll', checkLogin, checkAdmin, (req, res, next)=>{
     res.sendFile(path.join(__dirname, '../product_getAll.html'))
 })
 
-router.get('/:id', (req, res, next)=>{
-    var id = req.params.id
+router.get('/my', checkLogin, checkSeller, (req, res, next) => {
+    var token = req.cookies.token;
+    var sellerId = jwt.verify(token, publicKey);
+    ProductModel.find({ seller: sellerId })
+        .then(data => {
+            res.json(data);
+        })
+        .catch(err => {
+            res.status(500).json('Lỗi server');
+        });
+});
 
-    ProductModel.findById(id)
-    .then(data=>{
-        res.json(data)
-    })
-    .catch(err=>{
-        res.status(500).json('Loi server')
-    })
+router.get('/getMy', checkLogin, checkSeller, (req, res, next)=>{
+    res.sendFile(path.join(__dirname, '../product_my.html'));
 })
 
 // them moi du lieu vao db
@@ -138,7 +142,7 @@ router.post('/', (req, res, next)=>{
 })
 
 // update du lieu trong db
-router.put('/:id', (req, res, next)=>{
+router.put('/', (req, res, next)=>{
     var id = req.params.id
     var newtype = req.body.newtype
 

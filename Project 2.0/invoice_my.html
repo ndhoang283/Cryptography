@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice List</title>
+    <title>My Invoices</title>
     <style>
         table {
             border-collapse: collapse;
@@ -22,45 +20,45 @@
     </style>
 </head>
 <body>
-    <h1>Invoice List</h1>
+    <h1>My Invoices</h1>
+    
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Customer</th>
-                <th>Product</th>
+                <th>Invoice ID</th>
+                <th>Product ID</th>
                 <th>Quantity</th>
-                <th>Amount</th>
+                <th>Total Amount</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Use JavaScript to dynamically generate rows for each invoice -->
+        <tbody id="invoiceList">
+            <!-- Invoice information will be dynamically inserted here -->
         </tbody>
     </table>
-    <button onclick="home()">Home</button>
+    <button onclick="back()">Back</button>
     <script>
-        // Make a GET request to fetch invoice data
-        fetch('/api/invoice/', { method: 'GET' })
+        fetch('/api/invoice/my', { method: 'GET' })
             .then(response => response.json())
             .then(data => {
-                // Loop through the invoice data and generate rows for each invoice
-                data.forEach(invoice => {
+                const invoices = data;
+                const invoiceList = document.getElementById('invoiceList');
+                
+                invoices.forEach(invoice => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${invoice._id}</td>
-                        <td>${invoice.customer}</td>
                         <td>${invoice.product}</td>
                         <td>${invoice.quantity}</td>
                         <td>${invoice.ammout}</td>
                     `;
-                    document.querySelector('tbody').appendChild(row);
+                    invoiceList.appendChild(row);
                 });
             })
             .catch(error => console.error('Error:', error));
-        
-        function home(){
-            window.location.href='/api/account/admin'
+
+        function back() {
+            window.location.href='/api/account/customer'
         }
-   </script>     
+    </script>
 </body>
 </html>

@@ -35,7 +35,7 @@
             <!-- Use JavaScript to dynamically generate rows for each account -->
         </tbody>
     </table>
-
+    <button onclick="home()">Home</button>
     <script>
         // Make a GET request to fetch account data
         fetch('/api/account', { method: 'GET' })
@@ -55,6 +55,10 @@
                 });
             })
             .catch(error => console.error('Error:', error));
+
+        function home() {
+            window.location.href='/api/account/admin'
+        }
     </script>
 </body>
 </html>
