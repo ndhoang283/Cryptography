@@ -1,7 +1,0 @@
-depth=2 C = US, O = DigiCert Inc, OU = www.digicert.com, CN = DigiCert High Assurance EV Root CA
-verify return:1
-depth=1 C = US, O = DigiCert Inc, OU = www.digicert.com, CN = DigiCert SHA2 High Assurance Server CA
-verify return:1
-depth=0 C = US, ST = California, L = Menlo Park, O = "Meta Platforms, Inc.", CN = *.facebook.com
-verify return:1
-DONE
