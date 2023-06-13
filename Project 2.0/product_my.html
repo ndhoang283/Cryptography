@@ -17,6 +17,35 @@
         th {
             background-color: #f2f2f2;
         }
+
+        /* Styling for the modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -28,15 +57,33 @@
                 <th>Name</th>
                 <th>Price</th>
                 <th>Quantity</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody id="productList">
             <!-- Product list will be dynamically inserted here -->
         </tbody>
-
-        
     </table>
     <button onclick="back()">Back</button>
+    <button onclick="openModal()">Add Product</button>
+
+    <!-- Modal for adding a new product -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Add Product</h2>
+            <form id="addProductForm">
+                <label for="productName">Name:</label>
+                <input type="text" id="productName" required><br><br>
+                <label for="productPrice">Price:</label>
+                <input type="number" id="productPrice" required><br><br>
+                <label for="productQuantity">Quantity:</label>
+                <input type="number" id="productQuantity" required><br><br>
+                <button type="submit">Add</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Make a GET request to fetch the seller's products
         fetch('/api/product/my', { method: 'GET' })
@@ -53,6 +100,7 @@
                         <td>${product.name}</td>
                         <td>${product.price}</td>
                         <td>${product.quantity}</td>
+                        <td><button onclick="deleteProduct('${product._id}')">Delete</button></td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -60,8 +108,75 @@
             .catch(error => console.error('Error:', error));
 
         function back() {
-            window.location.href='/api/account/seller'
+            window.location.href = '/api/account/seller';
         }
+
+        function deleteProduct(productId) {
+            // Make a DELETE request to delete the product
+            fetch(`/api/product/seller/${productId}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove the deleted product from the table
+                    const row = document.getElementById(productId);
+                    if (row) {
+                        row.remove();
+                    }
+                    alert('Product deleted successfully!');
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Function to open the add product modal
+        function openModal() {
+            const modal = document.getElementById('addProductModal');
+            modal.style.display = 'block';
+        }
+
+        // Function to close the add product modal
+        function closeModal() {
+            const modal = document.getElementById('addProductModal');
+            modal.style.display = 'none';
+        }
+
+        // Add event listener for the add product form submission
+        const addProductForm = document.getElementById('addProductForm');
+        addProductForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const productName = document.getElementById('productName').value;
+            const productPrice = document.getElementById('productPrice').value;
+            const productQuantity = document.getElementById('productQuantity').value;
+
+            // Make a POST request to add the new product
+            fetch('/api/product/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: productName,
+                    price: productPrice,
+                    quantity: productQuantity
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Add the new product to the table
+                    const tableBody = document.getElementById('productList');
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${data._id}</td>
+                        <td>${data.name}</td>
+                        <td>${data.price}</td>
+                        <td>${data.quantity}</td>
+                        <td><button onclick="deleteProduct('${data._id}')">Delete</button></td>
+                    `;
+                    tableBody.appendChild(row);
+
+                    closeModal();
+                    alert('Product added successfully!');
+                })
+                .catch(error => console.error('Error:', error));
+        });
     </script>
 </body>
 </html>

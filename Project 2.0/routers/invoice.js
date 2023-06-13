@@ -9,7 +9,7 @@ var publicKey = fs.readFileSync('./key/public.crt')
 const path = require('path')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
-const PAGE_SIZE = 5
+const PAGE_SIZE = 100
 
 router.use('/public', express.static(path.join(__dirname, '../public')))
 router.use(cookieParser());
@@ -102,7 +102,7 @@ router.get('/getAll', checkLogin, checkAdmin, (req, res, next)=>{
     res.sendFile(path.join(__dirname, '../invoice_getAll.html'))
 })
 
-router.get('/my', (req, res, next)=>{
+router.get('/my', checkLogin, checkCustomer, (req, res, next)=>{
     var token = req.cookies.token;
     var Id = jwt.verify(token, publicKey);
     InvoiceModel.find({ customer: Id })
@@ -119,7 +119,7 @@ router.get('/getMy', checkLogin, checkCustomer, (req, res, next)=>{
 })
 
 // them moi du lieu vao db
-router.post('/', (req, res, next)=>{
+router.post('/', /*checkLogin, checkAdmin, */(req, res, next)=>{
     var customer = req.body.customer
     var product = req.body.product
     var quantity = req.body.quantity
@@ -140,7 +140,7 @@ router.post('/', (req, res, next)=>{
 })
 
 // update du lieu trong db
-router.put('/:id', (req, res, next)=>{
+router.put('/:id', checkAdmin, checkLogin, (req, res, next)=>{
     var id = req.params.id
     var newproduct = req.body.newproduct
 
@@ -156,7 +156,7 @@ router.put('/:id', (req, res, next)=>{
 })
 
 // xoa du lieu trong db
-router.delete('/:id', (req, res, next)=>{
+router.delete('/:id', checkLogin, checkAdmin, (req, res, next)=>{
     var id = req.params.id
 
     InvoiceModel.deleteOne({

@@ -9,7 +9,7 @@ const { json } = require('body-parser');
 var publicKey = fs.readFileSync('./key/public.crt')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
-const PAGE_SIZE = 5
+const PAGE_SIZE = 100
 
 router.use('/public', express.static(path.join(__dirname, 'public')))
 router.use(cookieParser());
@@ -121,9 +121,11 @@ router.get('/getMy', checkLogin, checkSeller, (req, res, next)=>{
 })
 
 // them moi du lieu vao db
-router.post('/', (req, res, next)=>{
+router.post('/', checkLogin, checkSeller, (req, res, next)=>{
+    var token = req.cookies.token;
+    var id = jwt.verify(token, publicKey);
     var name = req.body.name
-    var seller = req.body.seller
+    var seller = id
     var quantity = req.body.quantity
     var price = req.body.price
 
@@ -142,7 +144,7 @@ router.post('/', (req, res, next)=>{
 })
 
 // update du lieu trong db
-router.put('/', (req, res, next)=>{
+router.put('/', checkLogin, checkSeller, (req, res, next)=>{
     var id = req.params.id
     var newtype = req.body.newtype
 
@@ -158,18 +160,35 @@ router.put('/', (req, res, next)=>{
 })
 
 // xoa du lieu trong db
-router.delete('/:id', (req, res, next)=>{
-    var id = req.params.id
+router.delete('/:id', checkLogin, checkAdmin, (req, res, next) => {
+    var id = req.params.id;
 
-    ProductModel.deleteOne({
-        _id: id
-    })
-    .then(data=>{
-        res.json('xoa thanh cong')
-    })
-    .catch(err=>{
-        res.status(500).json('loi server')
-    })
-})
+    ProductModel.deleteOne({ _id: id })
+        .then(data => {
+            if (data.deletedCount > 0) {
+                res.json('Xóa thành công');
+            } else {
+                res.status(404).json('Sản phẩm không tồn tại');
+            }
+        })
+        .catch(err => {
+            res.status(500).json('Lỗi server');
+        });
+});
 
+router.delete('/seller/:id', checkLogin, checkSeller, (req, res, next) => {
+    var id = req.params.id;
+
+    ProductModel.deleteOne({ _id: id })
+        .then(data => {
+            if (data.deletedCount > 0) {
+                res.json('Xóa thành công');
+            } else {
+                res.status(404).json('Sản phẩm không tồn tại');
+            }
+        })
+        .catch(err => {
+            res.status(500).json('Lỗi server');
+        });
+});
 module.exports = router

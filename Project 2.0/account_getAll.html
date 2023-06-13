@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <script src="/public/js/jquery-3.7.0.min.js"></script>
     <title>Account List</title>
     <style>
         table {
@@ -29,13 +30,27 @@
                 <th>Name</th>
                 <th>Phone</th>
                 <th>Address</th>
+                <th>Role</th>
             </tr>
         </thead>
         <tbody>
             <!-- Use JavaScript to dynamically generate rows for each account -->
         </tbody>
-    </table>
+    </table> <br> <br>
+    Set role: <br>
+    id: <input type="text" id="id"> <br>
+    role: <input type="number" id="role"> <br>
+    <button onclick="setRole()">Set role</button><br><br>
+
+    Delete account <br>
+    id: <input type="text" id="id_delete"> <br>
+    <button onclick="deleteAccount()">Delete account</button><br><br>
     <button onclick="home()">Home</button>
+
+    <div id="popup" style="display: none;">
+        <p id="popup-message"></p>
+    </div>
+
     <script>
         // Make a GET request to fetch account data
         fetch('/api/account', { method: 'GET' })
@@ -50,6 +65,7 @@
                         <td>${account.name}</td>
                         <td>${account.phone}</td>
                         <td>${account.address}</td>
+                        <td>${account.role}</td>
                     `;
                     document.querySelector('tbody').appendChild(row);
                 });
@@ -58,6 +74,61 @@
 
         function home() {
             window.location.href='/api/account/admin'
+        }
+
+        function showPopup(message) {
+            var popup = document.getElementById("popup");
+            var popupMessage = document.getElementById("popup-message");
+            popupMessage.textContent = message;
+            popup.style.display = "block";
+        }
+
+        function hidePopup() {
+            var popup = document.getElementById("popup");
+            popup.style.display = "none";
+        }
+
+        function setRole() {
+            hidePopup();
+            $.ajax({
+                url: '/api/account/setRole',
+                type: 'POST',
+                data: {
+                    id: $('#id').val(),
+                    role: $('#role').val()
+                }
+            }).then(data => {
+                if (data === 'ok') {
+                    showPopup('Set success');
+                    $('#id').val('');
+                    $('#role').val('');
+                } else {
+                    showPopup('Set fail');
+                }
+            }).catch(err => {
+                showPopup('Set fail');
+            });
+        }
+
+        function deleteAccount() {
+            console.log('a')
+            hidePopup();
+            $.ajax({
+                url: '/api/account/delete',
+                type: 'POST',
+                data: {
+                    id: $('#id_delete').val()
+                }
+            }).then(data => {
+                if (data === 'ok') {
+                    showPopup('Delete success');
+                    $('#id_delete').val('');
+                } else {
+                    showPopup('Delete fail');
+                }
+            }).catch(err => {
+                showPopup('Delete fail');
+            });
         }
     </script>
 </body>

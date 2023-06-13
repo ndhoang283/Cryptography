@@ -31,6 +31,7 @@
                 <th>Product</th>
                 <th>Quantity</th>
                 <th>Amount</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -46,12 +47,14 @@
                 // Loop through the invoice data and generate rows for each invoice
                 data.forEach(invoice => {
                     const row = document.createElement('tr');
+                    row.id = invoice._id;
                     row.innerHTML = `
                         <td>${invoice._id}</td>
                         <td>${invoice.customer}</td>
                         <td>${invoice.product}</td>
                         <td>${invoice.quantity}</td>
                         <td>${invoice.ammout}</td>
+                        <td><button onclick="deleteInvoice('${invoice._id}')">Delete</button></td>
                     `;
                     document.querySelector('tbody').appendChild(row);
                 });
@@ -61,6 +64,21 @@
         function home(){
             window.location.href='/api/account/admin'
         }
-   </script>     
+
+        function deleteInvoice(invoiceId) {
+            // Make a DELETE request to delete the invoice
+            fetch(`/api/invoice/${invoiceId}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove the deleted invoice from the table
+                    const row = document.getElementById(invoiceId);
+                    if (row) {
+                        row.remove();
+                    }
+                    alert('Invoice deleted successfully!');
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>     
 </body>
 </html>

@@ -4,7 +4,7 @@ var fs = require('fs')
 var router = express.Router();
 const AccountModel = require('../models/account.js');
 const { json } = require('body-parser');
-const PAGE_SIZE = 5
+const PAGE_SIZE = 100
 var secretKey = fs.readFileSync('./key/keyforpassword.pem');
 var privateKey = fs.readFileSync('./key/private.pem')
 var publicKey = fs.readFileSync('./key/public.crt')
@@ -245,7 +245,7 @@ router.put('/', checkLogin, (req, res, next)=>{
     })
 })
 
-router.post('/setRole', (req, res, next)=>{
+router.post('/setRole', checkLogin, checkAdmin, (req, res, next)=>{
     var id = req.body.id
     var role = req.body.role
 
