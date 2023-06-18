@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="/public/js/jquery-3.7.0.min.js"></script>
+    <style>
+        #popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            z-index: 9999;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login</h1>
+
+    <label for="username">Username:</label>
+    <input type="text" id="username"> <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password"> <br>
+    <button onclick="login()">Login</button>
+
+    <div id="popup">
+        <p id="popup-message"></p>
+    </div>
+
+    <p>Don't have an account? <a href="/api/account/register">Register</a></p>
+
+    <button onclick="back()">Back</button>
+    <script>
+        function setCookie(cname, cvalue, exdays) {
+            const d = new Date();
+            d.setTime(d.getTime() + (exdays*24*60*60*1000));
+            let expires = "expires="+ d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for(let i = 0; i <ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        function showPopup(message) {
+            var popup = document.getElementById("popup");
+            var popupMessage = document.getElementById("popup-message");
+            popupMessage.textContent = message;
+            popup.style.display = "block";
+        }
+
+        function login() {
+            $.ajax({
+                url: '/api/account/login',
+                type: 'POST',
+                data: {
+                    username: $('#username').val(),
+                    password: $('#password').val()
+                }
+            }).then(data => {
+                if (data.message === 'ok') {
+                    setCookie('token', data.token, 1);
+                    window.location.href = '/home';
+                } else {
+                    showPopup('Invalid account');
+                }
+            }).catch(err => {
+                showPopup('Server Error');
+            });
+        }
+
+        function back() {
+            window.location.href='/home'
+        }
+    </script>
+</body>
+</html>

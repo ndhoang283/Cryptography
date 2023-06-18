@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice List</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Invoice List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Amount</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Use JavaScript to dynamically generate rows for each invoice -->
+        </tbody>
+    </table>
+    <button onclick="home()">Home</button>
+    <script>
+        // Make a GET request to fetch invoice data
+        fetch('/api/invoice/', { method: 'GET' })
+            .then(response => response.json())
+            .then(data => {
+                // Loop through the invoice data and generate rows for each invoice
+                data.forEach(invoice => {
+                    const row = document.createElement('tr');
+                    row.id = invoice._id;
+                    row.innerHTML = `
+                        <td>${invoice._id}</td>
+                        <td>${invoice.customer}</td>
+                        <td>${invoice.product}</td>
+                        <td>${invoice.quantity}</td>
+                        <td>${invoice.ammout}</td>
+                        <td><button onclick="deleteInvoice('${invoice._id}')">Delete</button></td>
+                    `;
+                    document.querySelector('tbody').appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        
+        function home(){
+            window.location.href='/api/account/admin'
+        }
+
+        function deleteInvoice(invoiceId) {
+            // Make a DELETE request to delete the invoice
+            fetch(`/api/invoice/${invoiceId}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove the deleted invoice from the table
+                    const row = document.getElementById(invoiceId);
+                    if (row) {
+                        row.remove();
+                    }
+                    alert('Invoice deleted successfully!');
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>     
+</body>
+</html>
